@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Elegant Circular Timer</title>
+  <style>
+    body {
+      background: #f2f5f8;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px 20px;
+      
+  margin: 30em;
+  padding: 19px;
+  border: 3px solid black;
+  box-sizing: border-box;
+  min-height: 25vh;
+  min-width: 50vh;
+  background-color: #f9f9f9;
+}
+      
+    
+
+    h2 {
+  color: #4CAF50;
+  font-size: 32px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 2px #ccc;
+  border-bottom: 3px solid #4CAF50;
+  padding-bottom: 8px;
+}
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .timer-wrapper {
+      position: relative;
+      width: 280px;
+      height: 280px;
+    }
+
+    svg {
+      width:100%;
+      height:100%;
+      transform: rotate(-90deg);
+    }
+
+    .circle-bg {
+      stroke: #ddd;
+      stroke-width: 15;
+    }
+
+    .circle-progress {
+      stroke: green;
+      stroke-width: 15;
+      fill: none;
+      stroke-linecap: round;
+      stroke-dasharray: 785;
+      stroke-dashoffset: 785;
+      transition: stroke-dashoffset 0.1s ease;
+    }
+
+    .time-display {
+      position: absolute;
+      top: 50%;
+      left: 45%;
+      transform: translate(-50%, -50%);
+      font-size: 38px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .control-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .presets, .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    input[type="number"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 120px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: black;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: black;
+    }
+
+    .presets button {
+      background-color: black;
+    }
+
+    .presets button:hover {
+      background-color: black;
+    }
+
+    .actions button:nth-child(2),
+    .actions button:nth-child(3) {
+      background-color: black;
+    }
+
+    .actions button:nth-child(2):hover,
+    .actions button:nth-child(3):hover {
+      background-color: black;
+    }
+
+    .actions button:last-child {
+      background-color:black;
+    }
+
+    .actions button:last-child:hover {
+      background-color:black;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2> STOP WATCH</h2>
+
+    
+
+    <div class="control-group">
+      <input type="number" id="secondsInput" placeholder="Enter seconds" min="1" />
+      <button onclick="startTimer()">Start</button>
+    </div>
+
+    <div class="actions">
+      <button onclick="pauseTimer()">Pause</button>
+      <button onclick="resumeTimer()">Resume</button>
+      <button onclick="resetTimer()">Reset</button>
+    </div>
+    <div class="timer-wrapper">
+      <svg>
+        <circle class="circle-bg" cx="125" cy="125" r="125" fill="none"></circle>
+        <circle class="circle-progress" id="progressCircle" cx="125" cy="125" r="125"></circle>
+      </svg>
+      <div class="time-display" id="timeDisplay">00</div>
+    </div>
+    <div class="presets">
+      <button onclick="setPreset(10)">10s</button>
+      <button onclick="setPreset(30)">30s</button>
+      <button onclick="setPreset(60)">1 min</button>
+    </div>
+
+    
+  </div>
+
+  <script>
+    let total = 0;
+    let timeLeft = 0;
+    let isPaused = false;
+    let animationId;
+    let lastTick = null;
+
+    function setPreset(seconds) {
+      document.getElementById("secondsInput").value = seconds;
+    }
+
+    function startTimer() {
+      const input = parseInt(document.getElementById("secondsInput").value);
+      if (isNaN(input) || input <= 0) {
+        alert("Please enter a valid time.");
+        return;
+      }
+      total = timeLeft = input;
+      isPaused = false;
+      lastTick = null;
+      cancelAnimationFrame(animationId);
+      requestAnimationFrame(updateTimer);
+    }
+
+    function pauseTimer() {
+      isPaused = true;
+    }
+
+    function resumeTimer() {
+      if (timeLeft > 0 && isPaused) {
+        isPaused = false;
+        lastTick = null;
+        requestAnimationFrame(updateTimer);
+      }
+    }
+
+    function resetTimer() {
+      cancelAnimationFrame(animationId);
+      timeLeft = total;
+      updateDisplay();
+      updateCircle();
+    }
+
+    function updateDisplay() {
+      document.getElementById("timeDisplay").innerText = timeLeft.toString().padStart(2, '0');
+    }
+
+    function updateCircle() {
+      const circle = document.getElementById("progressCircle");
+      const percent = (total - timeLeft) / total;
+      const offset = 785 * (1 - percent);
+      circle.style.strokeDashoffset = offset;
+    }
+
+    function updateTimer(timestamp) {
+      if (lastTick === null) lastTick = timestamp;
+
+      if (!isPaused) {
+        const elapsed = (timestamp - lastTick) / 1000;
+        if (elapsed >= 1) {
+          timeLeft = Math.max(0, timeLeft - 1);
+          updateDisplay();
+          updateCircle();
+          lastTick = timestamp;
+
+          if (timeLeft <= 0) {
+            document.getElementById("chime").play();
+            return;
+          }
+        }
+      }
+
+      animationId = requestAnimationFrame(updateTimer);
+    }
+  </script>
+
+</body>
+</html>
