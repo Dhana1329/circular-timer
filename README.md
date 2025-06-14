@@ -12,7 +12,8 @@ A sleek and stylish circular countdown timer with pause/resume functionality, ti
 
 ## 🖥️ Preview
 
-![Screenshot](screenshot.png) <!-- Optional: include a screenshot image -->
+![Screenshot](![Screenshot 2025-06-13 011305](https://github.com/user-attachments/assets/25e43add-390b-4e34-9ca5-031ea79f80bc)
+) <!-- Optional: include a screenshot image -->
 
 ## 🛠️ Technologies Used
 
@@ -24,4 +25,4 @@ A sleek and stylish circular countdown timer with pause/resume functionality, ti
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/circular-timer.git
+   git clone https://github.com/Dhana1329/circular-timer.git
